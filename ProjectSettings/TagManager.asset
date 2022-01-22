@@ -6,6 +6,7 @@ TagManager:
   tags:
   - MonsterSpawner
   - DiceCreateButton
+  - Dice
   layers:
   - Default
   - TransparentFX
