@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MonsterSpawnerManager : MonoBehaviour
 {
+
     float spawnTime;
     float spawnDelay = 2f;
     int hpMul;
@@ -39,7 +40,7 @@ public class MonsterSpawnerManager : MonoBehaviour
     int defaultHP;
     MonsterSpawner[] spawners;
 
-    static MonsterSpawnerManager instance;
+    public static MonsterSpawnerManager instance;
 
     //보스몹생성시 일반몹생성 막기위함
     public bool spawnOk;

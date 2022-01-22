@@ -41,7 +41,6 @@ public class MonsterBase : MonoBehaviour
         {
             type = value;
 
-            index = 0;
             switch (type)
             {
                 case MonsterType.Noraml:
@@ -66,7 +65,6 @@ public class MonsterBase : MonoBehaviour
     }
 
     float speed;
-    int index = 0;
     Vector3 movePoint;
 
     private void Awake()

@@ -11,7 +11,6 @@ public class MonsterSpawner : MonoBehaviour
 
     public Transform[] movePoints;
 
-
     int type;
     public int Type
     {
@@ -59,7 +58,7 @@ public class MonsterSpawner : MonoBehaviour
 
 
 
-        reqObject.gameObject.SetActive(true);
+        reqObject.SetActive(true);
     }
 
     public void PushMonster(GameObject obj)
