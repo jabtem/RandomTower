@@ -17,6 +17,20 @@ public class MonsterBase : MonoBehaviour
     public TextMeshPro hpText;
     SpriteRenderer spr;
     MonsterSpawner parent;
+    bool isDie;
+
+    int sp;
+    public int Sp
+    {
+        get
+        {
+            return sp;
+        }
+        set
+        {
+            sp = value;
+        }
+    }
 
     float hp;
     public float Hp
@@ -46,16 +60,19 @@ public class MonsterBase : MonoBehaviour
                 case MonsterType.Noraml:
                     spr.sprite = MonsterImages[(int)MonsterType.Noraml];
                     hpText.text = hp.ToString();
+                    sp = 10;
                     speed = 1f;
                     break;
                 case MonsterType.Big:
                     spr.sprite = MonsterImages[(int)MonsterType.Big];
                     hpText.text = hp.ToString();
+                    sp = 50;
                     speed = 0.88f;
                     break;
                 case MonsterType.Small:
                     spr.sprite = MonsterImages[(int)MonsterType.Small];
                     hpText.text = hp.ToString();
+                    sp = 10;
                     speed = 1.5f;
                     break;
             }
@@ -73,13 +90,34 @@ public class MonsterBase : MonoBehaviour
     }
 
 
+    void MonsterDie()
+    {
+         parent.PushMonster(this.gameObject);
+        if(!parent.IsAi)
+        {
+            GameManager.instance.Player.Sp += sp;
+            GameManager.instance.Player.Life -= 1;
+
+        }
+
+        else if(parent.IsAi)
+        {
+            GameManager.instance.Enemy.Sp += sp;
+            GameManager.instance.Enemy.Life -= 1;
+        }
+
+    }
+
     private void Update()
     {
         transform.position = Vector2.MoveTowards(transform.position, movePoint,speed*0.005f);
         if(transform.position == movePoint)
         {
             if (movePointsQueue.Count == 0)
-                parent.PushMonster(this.gameObject);
+            {
+                MonsterDie();
+            }
+                
             else
                 movePoint = movePointsQueue.Dequeue();
 

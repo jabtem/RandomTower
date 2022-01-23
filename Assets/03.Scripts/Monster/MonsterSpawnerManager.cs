@@ -6,7 +6,7 @@ public class MonsterSpawnerManager : MonoBehaviour
 {
 
     float spawnTime;
-    float spawnDelay = 2f;
+    float spawnDelay = 3f;
     int hpMul;
     int waveCount;
     public int WaveCount

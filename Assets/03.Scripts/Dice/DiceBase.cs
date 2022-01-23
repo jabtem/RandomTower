@@ -13,25 +13,36 @@ public class DiceBase : MonoBehaviour
 
     public SpriteRenderer[] dice_Eyes;
     SpriteRenderer spr;
+    Collider2D col;
     public Sprite[] diceImages;
 
-    MonsterSpawner monsterSpawner;
 
-    //드래그가능여부, 적군다이스는 드래그할수없어야되기때문
-    bool dragOk;
+
+
 
     //공격가능여부, 드래그중에는 공격이 발사되면안되기때문
     bool attackOk;
     [SerializeField]
-    bool gradeUp;
+    bool mergeOk;
     //등급업시킬 대상다이스
+    DiceBase mergeTarget;
+
+    //이다이스를 생성시킨 부모 생성기
+    DiceCreater parent;
+    public DiceCreater Parent
+    {
+        set
+        {
+            parent = value;
+        }
+    }
     [SerializeField]
-    DiceBase gradeUpTarget;
-
-
     bool isDrag;
     Vector2 startPos;
 
+    //드래그가능여부, 적군다이스는 드래그할수없어야되기때문
+    [SerializeField]
+    bool dragOk;
     public bool DragOk
     {
         get
@@ -43,7 +54,9 @@ public class DiceBase : MonoBehaviour
             dragOk = value;
         }
     }
+    //어느쪽 스포너에서 생성된 몬스터인지 파악(사거리가 무제한이므로 해당몬스터만때려야하기때문)
 
+    MonsterSpawner monsterSpawner;
     public MonsterSpawner MonsterSpawner
     {
         set
@@ -61,10 +74,11 @@ public class DiceBase : MonoBehaviour
         set
         {
             type = value;
-            SetDiceColor();
+            SetDiceType();
         }
     }
     //주사위 등급
+    [SerializeField]
     int grade;
     public int Grade
     {
@@ -89,10 +103,20 @@ public class DiceBase : MonoBehaviour
         }
     }
 
+    int index;
+    public int Index
+    {
+        set
+        {
+            index = value;
+        }
+    }
+
 
     private void Awake()
     {
         spr = GetComponent<SpriteRenderer>();
+        col = GetComponent<Collider2D>();
     }
     private void OnEnable()
     {
@@ -110,6 +134,7 @@ public class DiceBase : MonoBehaviour
     private void OnMouseDown()
     {
         SortingOrderSet(12);
+        parent.CheckMergerOk(this);
     }
 
     private void OnMouseDrag()
@@ -133,6 +158,9 @@ public class DiceBase : MonoBehaviour
 
             if (touch.phase == TouchPhase.Moved)
             {
+                if (!isDrag)
+                    isDrag = true;
+
                 Vector2 tochPos = Camera.main.ScreenToWorldPoint(touch.position);
                 transform.position = new Vector2(tochPos.x, tochPos.y);
             }
@@ -143,19 +171,23 @@ public class DiceBase : MonoBehaviour
 
     private void OnMouseUp()
     {
-        if(!gradeUp)
+        parent.RecoveryDiceInfo();
+
+        if (!mergeOk)
         {
             isDrag = false;
         }
-        else if(gradeUp)
+        else if(mergeOk)
         {
             int ranType = Random.Range(0, 3);
 
-            gradeUpTarget.Type = (DiceType)ranType;
-            gradeUpTarget.Grade += 1;
+            mergeTarget.Type = (DiceType)ranType;
+            mergeTarget.Grade += 1;
             transform.position = startPos;
+            parent.PushDice(this.gameObject, index);
             gameObject.SetActive(false);
         }
+
 
         SortingOrderSet(10);
     }
@@ -172,8 +204,8 @@ public class DiceBase : MonoBehaviour
             //타워의 타입이 같고 등급이 같으면 등급업가능
             if (collisionDice.Type == type && collisionDice.Grade == grade && isDrag &&collisionDice.DragOk)
             {
-                gradeUpTarget = collisionDice;
-                gradeUp = true;
+                mergeTarget = collisionDice;
+                mergeOk = true;
             }
         }
     }
@@ -181,8 +213,8 @@ public class DiceBase : MonoBehaviour
     {
         if (collision.tag == "Dice")
         {
-            gradeUpTarget = null;
-            gradeUp = false;
+            mergeTarget = null;
+            mergeOk = false;
         }
     }
 
@@ -194,6 +226,27 @@ public class DiceBase : MonoBehaviour
             eye.sortingOrder = layer+1;
         }
     }
+
+    public void SetSpriteColor(Color32 color)
+    {
+        //주사위색 변경
+        spr.color = color;
+        //주사위 눈금색 변경
+    }
+    public void SetEyeAlpah(int alpha)
+    {
+        foreach (var eye in dice_Eyes)
+        {
+            Color32 eyeColor32 = eye.color;
+            eyeColor32.a = (byte)alpha;
+            eye.color = eyeColor32;
+        }
+    }
+    public void SetColliderActve(bool value)
+    {
+        col.enabled = value;
+    }
+
 
 
     void SetDiceEyePositon(int grade)
@@ -278,7 +331,7 @@ public class DiceBase : MonoBehaviour
 
         }
     }
-    void SetDiceColor()
+    void SetDiceType()
     {
         switch(type)
         {

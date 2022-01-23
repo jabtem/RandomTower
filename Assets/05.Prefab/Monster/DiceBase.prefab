@@ -421,7 +421,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1508106015756985315
 Transform:
   m_ObjectHideFlags: 0
@@ -476,7 +476,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 11
   m_Sprite: {fileID: 21300000, guid: 44ca25949634b33498eabcf4a12a82fe, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -570,7 +570,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: 3d2a0687ab2772a4e86019637a10b046, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b01d0bf9831932b4697444650d24c737, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -604,7 +604,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b01d0bf9831932b4697444650d24c737, type: 3}
   - {fileID: 21300000, guid: 34c1fa73295dc2d4cb282d9a016b3df7, type: 3}
   - {fileID: 21300000, guid: 3d2a0687ab2772a4e86019637a10b046, type: 3}
-  gradeUp: 0
+  mergeOk: 0
+  isDrag: 0
+  dragOk: 0
+  grade: 0
 --- !u!61 &6412343487279645675
 BoxCollider2D:
   m_ObjectHideFlags: 0

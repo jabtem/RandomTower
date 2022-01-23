@@ -5,11 +5,22 @@ using UnityEngine;
 
 public class MonsterSpawner : MonoBehaviour
 {
+    enum UserLayer { Player = 8, Enemy};
+
     Stack<GameObject> monsterStack = new Stack<GameObject>();
 
     public GameObject monsterBase;
 
     public Transform[] movePoints;
+
+    bool isAi;
+    public bool IsAi
+    {
+        get
+        {
+            return isAi;
+        }
+    }
 
     int type;
     public int Type
@@ -25,6 +36,18 @@ public class MonsterSpawner : MonoBehaviour
         set
         {
             hp = value;
+        }
+    }
+
+    private void Awake()
+    {
+        if (gameObject.layer == (int)UserLayer.Player)
+        {
+            isAi = false;
+        }
+        else if (gameObject.layer == (int)UserLayer.Enemy)
+        {
+            isAi = true;
         }
     }
 
