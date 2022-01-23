@@ -138,8 +138,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-   
-
+    
 
     public static GameManager instance;
 
@@ -162,6 +161,77 @@ public class GameManager : MonoBehaviour
 
     public Sprite[] lifeSprite;
 
+    float gameTime;
+    public float GameTime
+    {
+        get
+        {
+            return gameTime;
+        }
+    }
+
+    //몬스터의 시간에따른 체력배수
+    int hpMul;
+    bool timerStart;
+    public bool TimerStart
+    {
+        set
+        {
+            timerStart = value;
+        }
+    }
+    public int HpMul
+    {
+        get
+        {
+            return hpMul;
+        }
+    }
+
+    //웨이브 숫자
+    int waveCount;
+    public int WaveCount
+    {
+        get
+        {
+            return waveCount;
+        }
+        set
+        {
+            waveCount = value;
+
+            //웨이브가 변경될때마다 기본체력계수와 체력에대한 배수값이 초기화
+            hpMul = 1;
+            gameTime = 100 - waveCount * 10;
+            deltaTime = 0;
+            switch (waveCount)
+            {
+                case 1:
+                    defaultHP = 100;
+                    break;
+                case 2:
+                    defaultHP = 960;
+                    break;
+                case 3:
+                    defaultHP = 2520;
+                    break;
+
+            }
+        }
+    }
+    //몬스터 HP 기본수치, 현재 웨이브에따라 변경
+    int defaultHP;
+    public int DefaultHp
+    {
+        get
+        {
+            return defaultHP;
+        }
+    }
+
+    float deltaTime;
+    Text TimerText;
+
     private void Awake()
     {
         if (instance == null)
@@ -171,8 +241,9 @@ public class GameManager : MonoBehaviour
             Destroy(this.gameObject);
         }
 
-        Application.targetFrameRate = 60; 
-
+        Application.targetFrameRate = 60;
+        TimerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<Text>();
+        instance.WaveCount = 1;
         player = new PlayerInfo();
         enemy = new UserInfo();
         player.LifeImage = GameObject.FindGameObjectWithTag("PlayerLife").GetComponentsInChildren<Image>();
@@ -183,12 +254,42 @@ public class GameManager : MonoBehaviour
         DefaultSetting(Enemy);
     }
 
+    private void Start()
+    {
+        TimerText.text = string.Format("{0:D2}:{1:D2}", (int)GameTime / 60, (int)GameTime % 60);
+    }
+
+
+    private void Update()
+    {
+        if(timerStart)
+            Timer();
+    }
+
     //기본값설정
     void DefaultSetting(UserInfo info)
     {
-        info.Sp = 100;
+        info.Sp = 1000;
         info.Cost = 10;
         info.Life = 3;
+    }
+
+    void Timer()
+    {
+
+        if (GameTime <= 0)
+            return;
+
+        gameTime -= Time.deltaTime;
+        deltaTime += Time.deltaTime;
+
+        TimerText.text = string.Format("{0:D2}:{1:D2}", ((int)GameTime) / 60, ((int)GameTime) % 60);
+
+        if(deltaTime >=10)
+        {
+            hpMul += 1;
+            deltaTime = 0;
+        }
     }
 
 

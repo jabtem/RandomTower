@@ -6,7 +6,7 @@ public class DiceBase : MonoBehaviour
 {
     public enum DiceType
     {
-        fire,electric,wind,
+        FIRE,ELECTRIC,WIND,MIMIC,MINE,COUNT
     }
 
 
@@ -16,13 +16,24 @@ public class DiceBase : MonoBehaviour
     Collider2D col;
     public Sprite[] diceImages;
 
+    Transform target;
+    public Transform Traget
+    {
+        get
+        {
+            return target;
+        }
+        set
+        {
+            target = value;
+        }
+    }
 
 
 
 
     //공격가능여부, 드래그중에는 공격이 발사되면안되기때문
     bool attackOk;
-    [SerializeField]
     bool mergeOk;
     //등급업시킬 대상다이스
     DiceBase mergeTarget;
@@ -36,12 +47,10 @@ public class DiceBase : MonoBehaviour
             parent = value;
         }
     }
-    [SerializeField]
     bool isDrag;
     Vector2 startPos;
 
     //드래그가능여부, 적군다이스는 드래그할수없어야되기때문
-    [SerializeField]
     bool dragOk;
     public bool DragOk
     {
@@ -55,7 +64,6 @@ public class DiceBase : MonoBehaviour
         }
     }
     //어느쪽 스포너에서 생성된 몬스터인지 파악(사거리가 무제한이므로 해당몬스터만때려야하기때문)
-
     MonsterSpawner monsterSpawner;
     public MonsterSpawner MonsterSpawner
     {
@@ -78,7 +86,6 @@ public class DiceBase : MonoBehaviour
         }
     }
     //주사위 등급
-    [SerializeField]
     int grade;
     public int Grade
     {
@@ -98,8 +105,6 @@ public class DiceBase : MonoBehaviour
                     eye.gameObject.SetActive(false);
             }
             SetDiceEyePositon(grade);
-
-
         }
     }
 
@@ -111,7 +116,8 @@ public class DiceBase : MonoBehaviour
             index = value;
         }
     }
-
+    [SerializeField]
+    float mimicColor;
 
     private void Awake()
     {
@@ -121,12 +127,50 @@ public class DiceBase : MonoBehaviour
     private void OnEnable()
     {
         startPos = transform.position;
+
+        if(Type == DiceType.MINE)
+        {
+            StartCoroutine(MiningStart());
+        }
     }
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
+    IEnumerator MiningStart()
+    {
+
+        while(true)
+        {
+            yield return new WaitForSeconds(10f - (grade-1)*0.5f);
+            if (!parent.isAI)
+                GameManager.instance.Player.Sp += 3;
+            else if (parent.isAI)
+                GameManager.instance.Enemy.Sp += 3;
+        }
+
+    }
+
     private void Update()
     {
         if((Vector2)transform.position != startPos && !isDrag) 
         {
             transform.position = Vector2.MoveTowards(transform.position, startPos, 0.1f);
+        }
+
+        if(Type == DiceType.MIMIC)
+        {
+
+            foreach (var eye in dice_Eyes)
+            {
+                eye.color = Color.HSVToRGB(mimicColor/360, 1f, 1f);
+            }
+            mimicColor += 4f;
+
+            if(mimicColor>=360)
+            {
+                mimicColor = 0;
+            }
         }
 
     }
@@ -179,7 +223,7 @@ public class DiceBase : MonoBehaviour
         }
         else if(mergeOk)
         {
-            int ranType = Random.Range(0, 3);
+            int ranType = Random.Range(0, (int)DiceType.COUNT);
 
             mergeTarget.Type = (DiceType)ranType;
             mergeTarget.Grade += 1;
@@ -192,7 +236,7 @@ public class DiceBase : MonoBehaviour
         SortingOrderSet(10);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision)
     {
 
 
@@ -201,12 +245,24 @@ public class DiceBase : MonoBehaviour
 
             DiceBase collisionDice = collision.gameObject.GetComponent<DiceBase>();
 
-            //타워의 타입이 같고 등급이 같으면 등급업가능
-            if (collisionDice.Type == type && collisionDice.Grade == grade && isDrag &&collisionDice.DragOk)
+            if(Type != DiceType.MIMIC)
             {
-                mergeTarget = collisionDice;
-                mergeOk = true;
+                //타워의 타입이 같고 등급이 같거나 다이스타입이 미믹인경우
+                if ((collisionDice.Type == type || collisionDice.Type == DiceType.MIMIC) && collisionDice.Grade == grade && isDrag && collisionDice.DragOk)
+                {
+                    mergeTarget = collisionDice;
+                    mergeOk = true;
+                }
             }
+            else if(Type == DiceType.MIMIC)
+            {
+                if (collisionDice.Grade == grade && isDrag && collisionDice.DragOk)
+                {
+                    mergeTarget = collisionDice;
+                    mergeOk = true;
+                }
+            }
+
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
@@ -226,13 +282,13 @@ public class DiceBase : MonoBehaviour
             eye.sortingOrder = layer+1;
         }
     }
-
+    //주사위색 변경
     public void SetSpriteColor(Color32 color)
     {
-        //주사위색 변경
+
         spr.color = color;
-        //주사위 눈금색 변경
     }
+    //주사위 눈금 투명도 변경
     public void SetEyeAlpah(int alpha)
     {
         foreach (var eye in dice_Eyes)
@@ -335,30 +391,43 @@ public class DiceBase : MonoBehaviour
     {
         switch(type)
         {
-            case DiceType.fire:
-                spr.sprite = diceImages[(int)DiceType.fire];
+            case DiceType.FIRE:
+                spr.sprite = diceImages[(int)DiceType.FIRE];
                 foreach (var eye in dice_Eyes)
                 {
                     eye.color = new Color32(255, 0, 0, 255);
                 }
                 
                 break;
-            case DiceType.electric:
-                spr.sprite = diceImages[(int)DiceType.electric];
+            case DiceType.ELECTRIC:
+                spr.sprite = diceImages[(int)DiceType.ELECTRIC];
                 foreach (var eye in dice_Eyes)
                 {
                     eye.color = new Color32(255, 180, 0, 255);
                 }
                 break;
-            case DiceType.wind:
-                spr.sprite = diceImages[(int)DiceType.wind];
+            case DiceType.WIND:
+                spr.sprite = diceImages[(int)DiceType.WIND];
                 foreach (var eye in dice_Eyes)
                 {
                     eye.color = new Color32(0, 255, 212, 255);
                 }
                 break;
+            case DiceType.MIMIC:
+                spr.sprite = diceImages[(int)DiceType.MIMIC];
+                mimicColor = 0f;
+                break;
+            case DiceType.MINE:
+                spr.sprite = diceImages[(int)DiceType.MINE];
+                foreach (var eye in dice_Eyes)
+                {
+                    eye.color = new Color32(0, 255, 247, 255);
+                }
+                break;
         }
     }
 
+
+    
 
 }

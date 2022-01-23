@@ -7,37 +7,7 @@ public class MonsterSpawnerManager : MonoBehaviour
 
     float spawnTime;
     float spawnDelay = 3f;
-    int hpMul;
-    int waveCount;
-    public int WaveCount
-    {
-        get
-        {
-            return waveCount;
-        }
-        set
-        {
-            waveCount = value;
 
-            //웨이브가 변경될때마다 기본체력계수와 체력에대한 배수값이 초기화
-            hpMul = 1;
-            switch (waveCount)
-            {
-                case 1:
-                    defaultHP = 100;
-                    break;
-                case 2:
-                    defaultHP = 960;
-                    break;
-                case 3:
-                    defaultHP = 2520;
-                    break;
-
-            }
-        }
-    }
-    //웨이브에따른 HP기본계수받기위함
-    int defaultHP;
     MonsterSpawner[] spawners;
 
     public static MonsterSpawnerManager instance;
@@ -67,7 +37,6 @@ public class MonsterSpawnerManager : MonoBehaviour
             spawners[i] = spawnObj[i].GetComponent<MonsterSpawner>();
         }
 
-        WaveCount = 1;
     }
 
     void Update()
@@ -78,11 +47,13 @@ public class MonsterSpawnerManager : MonoBehaviour
 
             if (spawnTime > spawnDelay)
             {
-                int randomType = Random.Range(0, 3);
+                int randomType = Random.Range(0, (int)MonsterBase.MonsterType.COUNT);
+                //최초 몬스터 생성이후부터 타이머시작
+                GameManager.instance.TimerStart = true;
                 foreach (MonsterSpawner spawner in spawners)
                 {
                     spawner.Type = randomType;
-                    spawner.HP = defaultHP * hpMul;
+                    spawner.HP = GameManager.instance.DefaultHp * GameManager.instance.HpMul;
                     spawner.PopMonster();
                 }
                 spawnTime = 0f;

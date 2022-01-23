@@ -99,7 +99,7 @@ public class DiceCreater : MonoBehaviour
         DiceBase diceBase = reqObject.GetComponent<DiceBase>();
 
         index = GetRandomIndex(diceBase);
-        randomType = Random.Range(0, 3);
+        randomType = Random.Range(0, (int)DiceBase.DiceType.COUNT);
 
 
         //해당베이스 재활용목적
@@ -127,15 +127,33 @@ public class DiceCreater : MonoBehaviour
     //현재 드래그한 다이스와 병합가능한 다이스들 강조목적
     public void CheckMergerOk(DiceBase dice)
     {
-        foreach(var diceinfo in DiceInfoDic)
+
+        if(dice.Type != DiceBase.DiceType.MIMIC)
         {
-            if(diceinfo.Value.Type != dice.Type || diceinfo.Value.Grade != dice.Grade)
+            foreach (var diceinfo in DiceInfoDic)
             {
-                diceinfo.Value.SetColliderActve(false);
-                diceinfo.Value.SetSpriteColor(new Color32(125,125,125,255));
-                diceinfo.Value.SetEyeAlpah(50);
+                if ((diceinfo.Value.Type != dice.Type && diceinfo.Value.Type != DiceBase.DiceType.MIMIC) || diceinfo.Value.Grade != dice.Grade)
+                {
+                    diceinfo.Value.SetColliderActve(false);
+                    diceinfo.Value.SetSpriteColor(new Color32(125, 125, 125, 255));
+                    diceinfo.Value.SetEyeAlpah(50);
+                }
             }
         }
+        else if(dice.Type == DiceBase.DiceType.MIMIC)
+        {
+            foreach (var diceinfo in DiceInfoDic)
+            {
+                if (diceinfo.Value.Grade != dice.Grade)
+                {
+                    diceinfo.Value.SetColliderActve(false);
+                    diceinfo.Value.SetSpriteColor(new Color32(125, 125, 125, 255));
+                    diceinfo.Value.SetEyeAlpah(50);
+                }
+            }
+        }
+
+
     }
 
     //다이스 색상 원상복구

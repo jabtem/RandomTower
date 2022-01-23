@@ -7,7 +7,7 @@ public class MonsterBase : MonoBehaviour
 {
     public enum MonsterType
     {
-        Noraml,Small,Big
+        NORMAL,SMALL,BIG,COUNT
     }
 
 
@@ -57,20 +57,21 @@ public class MonsterBase : MonoBehaviour
 
             switch (type)
             {
-                case MonsterType.Noraml:
-                    spr.sprite = MonsterImages[(int)MonsterType.Noraml];
+                case MonsterType.NORMAL:
+                    spr.sprite = MonsterImages[(int)MonsterType.NORMAL];
                     hpText.text = hp.ToString();
                     sp = 10;
                     speed = 1f;
                     break;
-                case MonsterType.Big:
-                    spr.sprite = MonsterImages[(int)MonsterType.Big];
+                case MonsterType.BIG:
+                    spr.sprite = MonsterImages[(int)MonsterType.BIG];
+                    hp *= 5;
                     hpText.text = hp.ToString();
                     sp = 50;
                     speed = 0.88f;
                     break;
-                case MonsterType.Small:
-                    spr.sprite = MonsterImages[(int)MonsterType.Small];
+                case MonsterType.SMALL:
+                    spr.sprite = MonsterImages[(int)MonsterType.SMALL];
                     hpText.text = hp.ToString();
                     sp = 10;
                     speed = 1.5f;
@@ -96,14 +97,11 @@ public class MonsterBase : MonoBehaviour
         if(!parent.IsAi)
         {
             GameManager.instance.Player.Sp += sp;
-            GameManager.instance.Player.Life -= 1;
-
         }
 
         else if(parent.IsAi)
         {
             GameManager.instance.Enemy.Sp += sp;
-            GameManager.instance.Enemy.Life -= 1;
         }
 
     }
@@ -116,6 +114,14 @@ public class MonsterBase : MonoBehaviour
             if (movePointsQueue.Count == 0)
             {
                 MonsterDie();
+                if (!parent.IsAi)
+                {
+                    GameManager.instance.Player.Life -= 1;
+                }
+                else if (parent.IsAi)
+                {
+                    GameManager.instance.Enemy.Life -= 1;
+                }
             }
                 
             else

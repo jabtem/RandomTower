@@ -12,6 +12,7 @@ TagManager:
   - PlayerSp
   - PlayerLife
   - EnemyLife
+  - Timer
   layers:
   - Default
   - TransparentFX
