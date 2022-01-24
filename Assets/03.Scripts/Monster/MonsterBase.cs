@@ -94,17 +94,17 @@ public class MonsterBase : MonoBehaviour
                     break;
                 case MonsterType.KNIGHT:
                     spr.sprite = MonsterImages[(int)MonsterType.KNIGHT - 1];
-                    sp = 50;
+                    sp = 100*GameManager.instance.WaveCount;
                     speed = 1f;
                     break;
                 case MonsterType.SNAKE:
                     spr.sprite = MonsterImages[(int)MonsterType.SNAKE - 1];
-                    sp = 50;
+                    sp = 100 * GameManager.instance.WaveCount;
                     speed = 1f;
                     break;
                 case MonsterType.SILENCE:
                     spr.sprite = MonsterImages[(int)MonsterType.SILENCE - 1];
-                    sp = 50;
+                    sp = 100 * GameManager.instance.WaveCount;
                     speed = 1f;
                     break;
 
