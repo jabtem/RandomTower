@@ -8,6 +8,17 @@ public class MonsterSpawner : MonoBehaviour
     enum UserLayer { Player = 8, Enemy};
 
     Stack<GameObject> monsterStack = new Stack<GameObject>();
+    //현재 필드에 생성되어있는 몬스터 정보 관리용
+    HashSet<MonsterBase> activeMonsterSet = new HashSet<MonsterBase>();
+
+    public HashSet<MonsterBase> ActiveMonsterSet
+    {
+        get
+        {
+            return activeMonsterSet;
+        }
+    }
+    int index;
 
     public GameObject monsterBase;
 
@@ -54,6 +65,7 @@ public class MonsterSpawner : MonoBehaviour
     void CreateMonater()
     {
         GameObject go = Instantiate(monsterBase);
+        go.name = $"MonsterBase{index++}";
         go.transform.SetParent(this.transform);
         go.SetActive(false);
         monsterStack.Push(go);
@@ -69,10 +81,12 @@ public class MonsterSpawner : MonoBehaviour
             CreateMonater();
         }
         reqObject = monsterStack.Pop();
-        
+
+
         //스포너위치에서 시작하도록
         reqObject.transform.position = transform.position;
         MonsterBase monsterBase = reqObject.GetComponent<MonsterBase>();
+        activeMonsterSet.Add(monsterBase);
         monsterBase.SetParentSpawner(this);
         monsterBase.EnqueueMovePoints(movePoints);
         monsterBase.Hp = hp;
@@ -87,6 +101,8 @@ public class MonsterSpawner : MonoBehaviour
     public void PushMonster(GameObject obj)
     {
         obj.SetActive(false);
+        MonsterBase monsterBase = obj.GetComponent<MonsterBase>();
+        activeMonsterSet.Remove(monsterBase);
         monsterStack.Push(obj);
     }
 

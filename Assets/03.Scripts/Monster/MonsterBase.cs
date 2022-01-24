@@ -17,7 +17,25 @@ public class MonsterBase : MonoBehaviour
     public TextMeshPro hpText;
     SpriteRenderer spr;
     MonsterSpawner parent;
+
+    //총이동거리
+    float totalMoveDistance;
+    public float TotalMoveDistance
+    {
+        get
+        {
+            return totalMoveDistance;
+        }
+    }
+
     bool isDie;
+    public bool IsDie
+    {
+        get
+        {
+            return isDie;
+        }
+    }
 
     int sp;
     public int Sp
@@ -42,6 +60,7 @@ public class MonsterBase : MonoBehaviour
         set
         {
             hp = value;
+            hpText.text = hp.ToString();
         }
     }
     MonsterType type;
@@ -59,20 +78,17 @@ public class MonsterBase : MonoBehaviour
             {
                 case MonsterType.NORMAL:
                     spr.sprite = MonsterImages[(int)MonsterType.NORMAL];
-                    hpText.text = hp.ToString();
                     sp = 10;
                     speed = 1f;
                     break;
                 case MonsterType.BIG:
                     spr.sprite = MonsterImages[(int)MonsterType.BIG];
-                    hp *= 5;
-                    hpText.text = hp.ToString();
+                    Hp *= 5;
                     sp = 50;
                     speed = 0.88f;
                     break;
                 case MonsterType.SMALL:
                     spr.sprite = MonsterImages[(int)MonsterType.SMALL];
-                    hpText.text = hp.ToString();
                     sp = 10;
                     speed = 1.5f;
                     break;
@@ -90,10 +106,20 @@ public class MonsterBase : MonoBehaviour
         spr = GetComponent<SpriteRenderer>();
     }
 
+    private void OnEnable()
+    {
+        isDie = false;
+        totalMoveDistance = 0f;
+    }
+
 
     void MonsterDie()
     {
-         parent.PushMonster(this.gameObject);
+        isDie = true;
+        //이동중에 다이스에게 죽으면 큐 클리어
+        movePointsQueue.Clear();
+
+        parent.PushMonster(this.gameObject);
         if(!parent.IsAi)
         {
             GameManager.instance.Player.Sp += sp;
@@ -103,12 +129,14 @@ public class MonsterBase : MonoBehaviour
         {
             GameManager.instance.Enemy.Sp += sp;
         }
-
     }
 
     private void Update()
     {
+        totalMoveDistance += speed;
         transform.position = Vector2.MoveTowards(transform.position, movePoint,speed*0.005f);
+        SortingOrderSet(1000 + (int)(totalMoveDistance));
+
         if(transform.position == movePoint)
         {
             if (movePointsQueue.Count == 0)
@@ -130,15 +158,33 @@ public class MonsterBase : MonoBehaviour
         }
     }
 
-    public void SetParentSpawner(MonsterSpawner m)
+    public void SetParentSpawner(MonsterSpawner monsterSpawner)
     {
-        parent = m;
+        parent = monsterSpawner;
     }
     public void EnqueueMovePoints(Transform[] tr)
     {
         foreach(var point in tr)
         {
             movePointsQueue.Enqueue(point.position);
+        }
+    }
+
+    void SortingOrderSet(int num)
+    {
+        spr.sortingOrder = num;
+        hpText.sortingOrder = num + 1;
+    }
+
+    public void BulletHit(int num)
+    {
+        if (isDie)
+            return;
+
+        Hp -= num;
+        if(Hp<= 0)
+        {
+            MonsterDie();
         }
     }
 }

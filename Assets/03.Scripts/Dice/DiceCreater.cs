@@ -104,8 +104,8 @@ public class DiceCreater : MonoBehaviour
 
         //해당베이스 재활용목적
         diceBase.Index = index;
-        diceBase.Type = (DiceBase.DiceType)randomType;
         diceBase.Grade = 1;
+        diceBase.Type = (DiceBase.DiceType)randomType;
         //각타워가 해당스포너에서 생성된 몬스터의 정보를 가지고있게하기위함 => 타겟선정목표
         diceBase.MonsterSpawner = spawner;
         //부모 정보를 넘김, 어느 다이스 생성기에서 만들어졌는지 알기위함, 타워 삭제또는 승급시 스택에 되돌려야하기때문

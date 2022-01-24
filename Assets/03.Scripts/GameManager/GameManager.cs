@@ -231,6 +231,7 @@ public class GameManager : MonoBehaviour
 
     float deltaTime;
     Text TimerText;
+    Text WaveText;
 
     private void Awake()
     {
@@ -243,7 +244,8 @@ public class GameManager : MonoBehaviour
 
         Application.targetFrameRate = 60;
         TimerText = GameObject.FindGameObjectWithTag("Timer").GetComponent<Text>();
-        instance.WaveCount = 1;
+        WaveText = GameObject.FindGameObjectWithTag("Wave").GetComponent<Text>();
+        WaveCount = 1;
         player = new PlayerInfo();
         enemy = new UserInfo();
         player.LifeImage = GameObject.FindGameObjectWithTag("PlayerLife").GetComponentsInChildren<Image>();
@@ -257,6 +259,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         TimerText.text = string.Format("{0:D2}:{1:D2}", (int)GameTime / 60, (int)GameTime % 60);
+        WaveText.text = $"Wave {WaveCount}";
     }
 
 
@@ -278,14 +281,16 @@ public class GameManager : MonoBehaviour
     {
 
         if (GameTime <= 0)
-            return;
+        {
+            WaveCount += 1;
+        }
 
         gameTime -= Time.deltaTime;
         deltaTime += Time.deltaTime;
 
         TimerText.text = string.Format("{0:D2}:{1:D2}", ((int)GameTime) / 60, ((int)GameTime) % 60);
-
-        if(deltaTime >=10)
+        WaveText.text = $"Wave {WaveCount}";
+        if (deltaTime >=10)
         {
             hpMul += 1;
             deltaTime = 0;

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8357110963466960624}
   - component: {fileID: 2906884492797744430}
+  - component: {fileID: 5812233019550062634}
   m_Layer: 0
   m_Name: dice_eye_6
   m_TagString: Untagged
@@ -81,6 +82,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5812233019550062634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2287932285533495845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6320134fbc198fb449d20b6f647e9352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 6517784401909110822, guid: 3ac0fde04e2d09b47847f34758b49b23,
+    type: 3}
 --- !u!1 &2491415629229264916
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,6 +106,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3910825791057700119}
   - component: {fileID: 2202032906741093174}
+  - component: {fileID: 4457838258167547568}
   m_Layer: 0
   m_Name: dice_eye_5
   m_TagString: Untagged
@@ -162,6 +178,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4457838258167547568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2491415629229264916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6320134fbc198fb449d20b6f647e9352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 6517784401909110822, guid: 3ac0fde04e2d09b47847f34758b49b23,
+    type: 3}
 --- !u!1 &4668928815896521776
 GameObject:
   m_ObjectHideFlags: 0
@@ -172,6 +202,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1151504772371618706}
   - component: {fileID: 5206685283807838457}
+  - component: {fileID: 6419432941346957325}
   m_Layer: 0
   m_Name: dice_eye_3
   m_TagString: Untagged
@@ -243,6 +274,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6419432941346957325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4668928815896521776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6320134fbc198fb449d20b6f647e9352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 6517784401909110822, guid: 3ac0fde04e2d09b47847f34758b49b23,
+    type: 3}
 --- !u!1 &4895299786348761391
 GameObject:
   m_ObjectHideFlags: 0
@@ -253,6 +298,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6586693883411229974}
   - component: {fileID: 6012199851065948354}
+  - component: {fileID: 5047487396420034837}
   m_Layer: 0
   m_Name: dice_eye_4
   m_TagString: Untagged
@@ -324,6 +370,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &5047487396420034837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4895299786348761391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6320134fbc198fb449d20b6f647e9352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 6517784401909110822, guid: 3ac0fde04e2d09b47847f34758b49b23,
+    type: 3}
 --- !u!1 &7464848947193320578
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,6 +394,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5744890275414522023}
   - component: {fileID: 3410638560384960735}
+  - component: {fileID: 8008389917938291017}
   m_Layer: 0
   m_Name: dice_eye_1
   m_TagString: Untagged
@@ -395,7 +456,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 11
   m_Sprite: {fileID: 21300000, guid: 44ca25949634b33498eabcf4a12a82fe, type: 3}
-  m_Color: {r: 0, g: 1, b: 0.9648104, a: 1}
+  m_Color: {r: 0.7607843, g: 0.2509804, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -405,6 +466,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &8008389917938291017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7464848947193320578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6320134fbc198fb449d20b6f647e9352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 6517784401909110822, guid: 3ac0fde04e2d09b47847f34758b49b23,
+    type: 3}
 --- !u!1 &7481455144421551849
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,6 +490,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1508106015756985315}
   - component: {fileID: 2648876199636837385}
+  - component: {fileID: 4622035135828026204}
   m_Layer: 0
   m_Name: dice_eye_2
   m_TagString: Untagged
@@ -486,6 +562,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4622035135828026204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7481455144421551849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6320134fbc198fb449d20b6f647e9352, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 6517784401909110822, guid: 3ac0fde04e2d09b47847f34758b49b23,
+    type: 3}
 --- !u!1 &8826392440942458053
 GameObject:
   m_ObjectHideFlags: 0
@@ -570,7 +660,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: 7ac5c03ff386b90449cf85607465b363, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 59c7f958413515a4ab49000f88bac427, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -593,7 +683,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33544071573ecb64e8786b2ad29ce36e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dice_Eyes:
+  diceEyeSpr:
   - {fileID: 3410638560384960735}
   - {fileID: 2648876199636837385}
   - {fileID: 5206685283807838457}
@@ -606,8 +696,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 3d2a0687ab2772a4e86019637a10b046, type: 3}
   - {fileID: 21300000, guid: 5117fa7579d3d1048b0d1061689488c7, type: 3}
   - {fileID: 21300000, guid: 7ac5c03ff386b90449cf85607465b363, type: 3}
-  - {fileID: 21300000, guid: 42cd3fb7d789543479894e2a265060f5, type: 3}
-  mimicColor: 0
+  - {fileID: 21300000, guid: 43a6d17222289194a9100d7cffe3a835, type: 3}
+  - {fileID: 21300000, guid: 59c7f958413515a4ab49000f88bac427, type: 3}
 --- !u!61 &6412343487279645675
 BoxCollider2D:
   m_ObjectHideFlags: 0

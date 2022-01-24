@@ -13,6 +13,10 @@ TagManager:
   - PlayerLife
   - EnemyLife
   - Timer
+  - Wave
+  - Result
+  - ResultText
+  - RestartButton
   layers:
   - Default
   - TransparentFX

@@ -6,18 +6,22 @@ public class DiceBase : MonoBehaviour
 {
     public enum DiceType
     {
-        FIRE,ELECTRIC,WIND,MIMIC,MINE,COUNT
+        FIRE,ELECTRIC,WIND,MIMIC,MINE,IRON,BROKEN,COUNT
+    }
+    public enum TargetPrority
+    {
+        FRONT,DBURFF,HIGHHP,RANDOM,NOATTACK,COUNT
     }
 
 
-
-    public SpriteRenderer[] dice_Eyes;
+    public SpriteRenderer[] diceEyeSpr;
+    DiceEye[] diceEyes;
     SpriteRenderer spr;
     Collider2D col;
     public Sprite[] diceImages;
 
-    Transform target;
-    public Transform Traget
+    GameObject target;
+    public GameObject Target
     {
         get
         {
@@ -35,6 +39,19 @@ public class DiceBase : MonoBehaviour
     //공격가능여부, 드래그중에는 공격이 발사되면안되기때문
     bool attackOk;
     bool mergeOk;
+
+
+    //공격력과 공격속도
+    float attackSpeed;
+    int attackPower;
+    public int AttackPower
+    {
+        get
+        {
+            return attackPower;
+        }
+    }
+
     //등급업시킬 대상다이스
     DiceBase mergeTarget;
 
@@ -82,9 +99,12 @@ public class DiceBase : MonoBehaviour
         set
         {
             type = value;
+            StopAllCoroutines();
             SetDiceType();
         }
     }
+
+    TargetPrority priority;
     //주사위 등급
     int grade;
     public int Grade
@@ -99,7 +119,7 @@ public class DiceBase : MonoBehaviour
             grade = value;
 
             //등급변경시 기존활성화된 눈 전부 비활성화
-            foreach(var eye in dice_Eyes)
+            foreach(var eye in diceEyeSpr)
             {
                 if(eye.gameObject.activeSelf)
                     eye.gameObject.SetActive(false);
@@ -116,18 +136,20 @@ public class DiceBase : MonoBehaviour
             index = value;
         }
     }
-    [SerializeField]
     float mimicColor;
+
+    float attacDelay;
 
     private void Awake()
     {
         spr = GetComponent<SpriteRenderer>();
         col = GetComponent<Collider2D>();
+        diceEyes = gameObject.GetComponentsInChildren<DiceEye>(true);
     }
     private void OnEnable()
     {
         startPos = transform.position;
-
+        
         if(Type == DiceType.MINE)
         {
             StartCoroutine(MiningStart());
@@ -161,7 +183,7 @@ public class DiceBase : MonoBehaviour
         if(Type == DiceType.MIMIC)
         {
 
-            foreach (var eye in dice_Eyes)
+            foreach (var eye in diceEyeSpr)
             {
                 eye.color = Color.HSVToRGB(mimicColor/360, 1f, 1f);
             }
@@ -173,12 +195,84 @@ public class DiceBase : MonoBehaviour
             }
         }
 
+        if(priority != TargetPrority.NOATTACK)
+        {
+
+            if(attackOk)
+            {
+                attacDelay += Time.deltaTime;
+
+                if(attacDelay > attackSpeed)
+                {
+                    TargetSet();
+                    if(target != null)
+                        Attack();
+                    attacDelay = 0;
+                }
+
+            }
+
+        }
+
+    }
+
+    void Attack()
+    {
+        foreach(var eye in diceEyes)
+        {
+            if(eye.gameObject.activeSelf)
+                eye.PopBullet();
+        }
+    }
+
+    void TargetSet()
+    {
+        float max = 0f;
+        GameObject tempTarget = null;
+        //현재 활성화되어있는 모든몬스터를 탐색해서 공격우선순위에따라 대상지정
+        if(monsterSpawner.ActiveMonsterSet.Count!=0)
+        {
+            foreach (var monster in monsterSpawner.ActiveMonsterSet)
+            {
+                if (priority == TargetPrority.FRONT)
+                {
+                    if (monster.TotalMoveDistance > max)
+                    {
+                        max = monster.TotalMoveDistance;
+                        tempTarget = monster.gameObject;
+                    }
+                }
+                else if(priority == TargetPrority.HIGHHP)
+                {
+                    if(monster.Hp > max)
+                    {
+                        max = monster.Hp;
+                        tempTarget = monster.gameObject;
+                    }
+                }
+                else if(priority == TargetPrority.RANDOM)
+                {
+                    int ranNum = Random.Range(0, 10);
+
+                    if(ranNum > max)
+                    {
+                        max = ranNum;
+                        tempTarget = monster.gameObject;
+                    }
+                }
+
+            }
+        }
+
+
+        Target = tempTarget;
     }
 
     private void OnMouseDown()
     {
-        SortingOrderSet(12);
+        SortingOrderSet(2000);
         parent.CheckMergerOk(this);
+        attackOk = false;
     }
 
     private void OnMouseDrag()
@@ -220,13 +314,16 @@ public class DiceBase : MonoBehaviour
         if (!mergeOk)
         {
             isDrag = false;
+            if(priority != TargetPrority.NOATTACK)
+            {
+                attackOk = true;
+            }
         }
         else if(mergeOk)
         {
             int ranType = Random.Range(0, (int)DiceType.COUNT);
-
-            mergeTarget.Type = (DiceType)ranType;
             mergeTarget.Grade += 1;
+            mergeTarget.Type = (DiceType)ranType;
             transform.position = startPos;
             parent.PushDice(this.gameObject, index);
             gameObject.SetActive(false);
@@ -277,7 +374,7 @@ public class DiceBase : MonoBehaviour
     void SortingOrderSet(int layer)
     {
         spr.sortingOrder = layer;
-        foreach (var eye in dice_Eyes)
+        foreach (var eye in diceEyeSpr)
         {
             eye.sortingOrder = layer+1;
         }
@@ -291,7 +388,7 @@ public class DiceBase : MonoBehaviour
     //주사위 눈금 투명도 변경
     public void SetEyeAlpah(int alpha)
     {
-        foreach (var eye in dice_Eyes)
+        foreach (var eye in diceEyeSpr)
         {
             Color32 eyeColor32 = eye.color;
             eyeColor32.a = (byte)alpha;
@@ -311,78 +408,78 @@ public class DiceBase : MonoBehaviour
         {
             case 1:
                 //가운데
-                dice_Eyes[0].transform.position = transform.TransformPoint(new Vector2(0, 0));
-                dice_Eyes[0].gameObject.SetActive(true);
+                diceEyeSpr[0].transform.position = transform.TransformPoint(new Vector2(0, 0));
+                diceEyeSpr[0].gameObject.SetActive(true);
                 break;
             case 2:
                 //좌측하단
-                dice_Eyes[0].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
-                dice_Eyes[0].gameObject.SetActive(true);
+                diceEyeSpr[0].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
+                diceEyeSpr[0].gameObject.SetActive(true);
                 //우측상단
-                dice_Eyes[1].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
-                dice_Eyes[1].gameObject.SetActive(true);
+                diceEyeSpr[1].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
+                diceEyeSpr[1].gameObject.SetActive(true);
                 break;
             case 3:
                 //가운데
-                dice_Eyes[0].transform.position = transform.TransformPoint(new Vector2(0, 0));
-                dice_Eyes[0].gameObject.SetActive(true);
+                diceEyeSpr[0].transform.position = transform.TransformPoint(new Vector2(0, 0));
+                diceEyeSpr[0].gameObject.SetActive(true);
                 //좌측하단
-                dice_Eyes[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
-                dice_Eyes[1].gameObject.SetActive(true);
+                diceEyeSpr[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
+                diceEyeSpr[1].gameObject.SetActive(true);
                 //우측상단
-                dice_Eyes[2].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
-                dice_Eyes[2].gameObject.SetActive(true);
+                diceEyeSpr[2].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
+                diceEyeSpr[2].gameObject.SetActive(true);
                 break;
             case 4:
                 //좌측상단
-                dice_Eyes[0].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0.3f));
-                dice_Eyes[0].gameObject.SetActive(true);
+                diceEyeSpr[0].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0.3f));
+                diceEyeSpr[0].gameObject.SetActive(true);
                 //좌측하단
-                dice_Eyes[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
-                dice_Eyes[1].gameObject.SetActive(true);
+                diceEyeSpr[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
+                diceEyeSpr[1].gameObject.SetActive(true);
                 //우측상단
-                dice_Eyes[2].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
-                dice_Eyes[2].gameObject.SetActive(true);
+                diceEyeSpr[2].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
+                diceEyeSpr[2].gameObject.SetActive(true);
                 //우측하단
-                dice_Eyes[3].transform.position = transform.TransformPoint(new Vector2(0.3f, -0.3f));
-                dice_Eyes[3].gameObject.SetActive(true);
+                diceEyeSpr[3].transform.position = transform.TransformPoint(new Vector2(0.3f, -0.3f));
+                diceEyeSpr[3].gameObject.SetActive(true);
                 break;
             case 5:
                 //가운데
-                dice_Eyes[0].transform.position = transform.TransformPoint(new Vector2(0, 0));
-                dice_Eyes[0].gameObject.SetActive(true);
+                diceEyeSpr[0].transform.position = transform.TransformPoint(new Vector2(0, 0));
+                diceEyeSpr[0].gameObject.SetActive(true);
                 //좌측상단
-                dice_Eyes[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0.3f));
-                dice_Eyes[1].gameObject.SetActive(true);
+                diceEyeSpr[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0.3f));
+                diceEyeSpr[1].gameObject.SetActive(true);
                 //좌측하단
-                dice_Eyes[2].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
-                dice_Eyes[2].gameObject.SetActive(true);
+                diceEyeSpr[2].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
+                diceEyeSpr[2].gameObject.SetActive(true);
                 //우측상단
-                dice_Eyes[3].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
-                dice_Eyes[3].gameObject.SetActive(true);
+                diceEyeSpr[3].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
+                diceEyeSpr[3].gameObject.SetActive(true);
                 //우측하단
-                dice_Eyes[4].transform.position = transform.TransformPoint(new Vector2(0.3f, -0.3f));
-                dice_Eyes[4].gameObject.SetActive(true);
+                diceEyeSpr[4].transform.position = transform.TransformPoint(new Vector2(0.3f, -0.3f));
+                diceEyeSpr[4].gameObject.SetActive(true);
                 break;
             case 6:
                 //좌측
-                dice_Eyes[0].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0));
-                dice_Eyes[0].gameObject.SetActive(true);
+                diceEyeSpr[0].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0));
+                diceEyeSpr[0].gameObject.SetActive(true);
                 //좌측상단
-                dice_Eyes[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0.3f));
-                dice_Eyes[1].gameObject.SetActive(true);
+                diceEyeSpr[1].transform.position = transform.TransformPoint(new Vector2(-0.3f, 0.3f));
+                diceEyeSpr[1].gameObject.SetActive(true);
                 //좌측하단
-                dice_Eyes[2].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
-                dice_Eyes[2].gameObject.SetActive(true);
+                diceEyeSpr[2].transform.position = transform.TransformPoint(new Vector2(-0.3f, -0.3f));
+                diceEyeSpr[2].gameObject.SetActive(true);
                 //우측상단
-                dice_Eyes[3].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
-                dice_Eyes[3].gameObject.SetActive(true);
+                diceEyeSpr[3].transform.position = transform.TransformPoint(new Vector2(0.3f, 0.3f));
+                diceEyeSpr[3].gameObject.SetActive(true);
                 //우측하단
-                dice_Eyes[4].transform.position = transform.TransformPoint(new Vector2(0.3f, -0.3f));
-                dice_Eyes[4].gameObject.SetActive(true);
+                diceEyeSpr[4].transform.position = transform.TransformPoint(new Vector2(0.3f, -0.3f));
+                diceEyeSpr[4].gameObject.SetActive(true);
                 //우측
-                dice_Eyes[5].transform.position = transform.TransformPoint(new Vector2(0.3f, 0));
-                dice_Eyes[5].gameObject.SetActive(true);
+                diceEyeSpr[5].transform.position = transform.TransformPoint(new Vector2(0.3f, 0));
+                diceEyeSpr[5].gameObject.SetActive(true);
                 break;
 
         }
@@ -393,7 +490,11 @@ public class DiceBase : MonoBehaviour
         {
             case DiceType.FIRE:
                 spr.sprite = diceImages[(int)DiceType.FIRE];
-                foreach (var eye in dice_Eyes)
+                priority = TargetPrority.FRONT;
+                attackSpeed = 0.8f - 0.01f * (grade - 1);
+                attackPower = 20 + 3*(grade-1);
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
                 {
                     eye.color = new Color32(255, 0, 0, 255);
                 }
@@ -401,27 +502,59 @@ public class DiceBase : MonoBehaviour
                 break;
             case DiceType.ELECTRIC:
                 spr.sprite = diceImages[(int)DiceType.ELECTRIC];
-                foreach (var eye in dice_Eyes)
+                priority = TargetPrority.FRONT;
+                attackSpeed = 0.7f -0.02f*(grade-1);
+                attackPower = 30 + 3*(grade-1);
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
                 {
                     eye.color = new Color32(255, 180, 0, 255);
                 }
                 break;
             case DiceType.WIND:
                 spr.sprite = diceImages[(int)DiceType.WIND];
-                foreach (var eye in dice_Eyes)
+                priority = TargetPrority.FRONT;
+                attackSpeed = 0.45f * (1+0.2f*(grade-1f));
+                attackPower = 20 + 3*(grade - 1);
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
                 {
                     eye.color = new Color32(0, 255, 212, 255);
                 }
                 break;
             case DiceType.MIMIC:
                 spr.sprite = diceImages[(int)DiceType.MIMIC];
+                priority = TargetPrority.NOATTACK;
                 mimicColor = 0f;
                 break;
             case DiceType.MINE:
                 spr.sprite = diceImages[(int)DiceType.MINE];
-                foreach (var eye in dice_Eyes)
+                priority = TargetPrority.NOATTACK;
+                foreach (var eye in diceEyeSpr)
                 {
                     eye.color = new Color32(0, 255, 247, 255);
+                }
+                break;
+            case DiceType.IRON:
+                spr.sprite = diceImages[(int)DiceType.IRON];
+                priority = TargetPrority.HIGHHP;
+                attackPower = 100 + 10 * (grade - 1);
+                attackSpeed = 1f;
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
+                {
+                    eye.color = new Color32(123, 123, 123, 255);
+                }
+                break;
+            case DiceType.BROKEN:
+                spr.sprite = diceImages[(int)DiceType.BROKEN];
+                priority = TargetPrority.RANDOM;
+                attackPower = 50 + 10 * (grade - 1);
+                attackSpeed = 0.9f;
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
+                {
+                    eye.color = new Color32(194, 64, 255, 255);
                 }
                 break;
         }

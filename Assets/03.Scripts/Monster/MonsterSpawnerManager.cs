@@ -6,7 +6,7 @@ public class MonsterSpawnerManager : MonoBehaviour
 {
 
     float spawnTime;
-    float spawnDelay = 3f;
+    float spawnDelay = 4f;
 
     MonsterSpawner[] spawners;
 
