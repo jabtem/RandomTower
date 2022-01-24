@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -172,6 +173,7 @@ public class GameManager : MonoBehaviour
 
     //몬스터의 시간에따른 체력배수
     int hpMul;
+    bool gameOver;
     bool timerStart;
     public bool TimerStart
     {
@@ -232,6 +234,9 @@ public class GameManager : MonoBehaviour
     float deltaTime;
     Text TimerText;
     Text WaveText;
+    GameObject result;
+    Text resultText;
+    Button restartButton;
 
     private void Awake()
     {
@@ -252,6 +257,9 @@ public class GameManager : MonoBehaviour
         enemy.LifeImage = GameObject.FindGameObjectWithTag("EnemyLife").GetComponentsInChildren<Image>();
         player.CostText = GameObject.FindGameObjectWithTag("PlayerCost").GetComponent<Text>();
         player.SpText = GameObject.FindGameObjectWithTag("PlayerSp").GetComponent<Text>();
+        result = GameObject.FindGameObjectWithTag("Result");
+        resultText = GameObject.FindGameObjectWithTag("ResultText").GetComponent<Text>();
+        restartButton = GameObject.FindGameObjectWithTag("RestartButton").GetComponent<Button>();
         DefaultSetting(Player);
         DefaultSetting(Enemy);
     }
@@ -260,35 +268,61 @@ public class GameManager : MonoBehaviour
     {
         TimerText.text = string.Format("{0:D2}:{1:D2}", (int)GameTime / 60, (int)GameTime % 60);
         WaveText.text = $"Wave {WaveCount}";
+        restartButton.onClick.AddListener(() => { Restart(); });
+        result.SetActive(false);
     }
 
 
     private void Update()
     {
-        if(timerStart)
+        if(!gameOver && timerStart)
             Timer();
+
     }
 
     //기본값설정
     void DefaultSetting(UserInfo info)
     {
-        info.Sp = 1000;
+        info.Sp = 100;
         info.Cost = 10;
         info.Life = 3;
     }
 
+    public bool bossSpawnOk;
+
     void Timer()
     {
-
-        if (GameTime <= 0)
+        if(player.Life ==0)
         {
-            WaveCount += 1;
+            SetResult(player.Life);
+            gameOver = true;
+        }
+        else if (WaveCount >= 4)
+        {
+            SetResult(player.Life);
+            gameOver = true;
         }
 
-        gameTime -= Time.deltaTime;
-        deltaTime += Time.deltaTime;
+        //보스소환조건충족
+        if (GameTime <= 0 && !bossSpawnOk && MonsterSpawnerManager.instance.spawnOk)
+        {
+            //WaveCount += 1;
+            bossSpawnOk = true;
+            //일반몬스터가 생성되지않게함
+            MonsterSpawnerManager.instance.spawnOk = false;
+        }
+        else if(GameTime >= 0 && MonsterSpawnerManager.instance.spawnOk)
+        {
+            gameTime -= Time.deltaTime;
+            deltaTime += Time.deltaTime;
+            TimerText.text = string.Format("{0:D2}:{1:D2}", ((int)GameTime) / 60, ((int)GameTime) % 60);
+        }
+        else if(!MonsterSpawnerManager.instance.spawnOk)
+        {
+            TimerText.text = "보스 출현중";
+        }
 
-        TimerText.text = string.Format("{0:D2}:{1:D2}", ((int)GameTime) / 60, ((int)GameTime) % 60);
+
         WaveText.text = $"Wave {WaveCount}";
         if (deltaTime >=10)
         {
@@ -297,5 +331,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void SetResult(int life)
+    {
+        result.SetActive(true);
+        if (life > 0)
+        {
+            resultText.text = "Win !";
+        }
+        else
+            resultText.text = "Lose..";
+    }
 
+    void Restart()
+    {
+        //별도의 씬이 존재하지않으므로 현재씬 재시작
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void WaveUp()
+    {
+        WaveCount += 1;
+        deltaTime = 0;
+        MonsterSpawnerManager.instance.spawnOk = true;
+    }
 }

@@ -7,7 +7,7 @@ public class MonsterBase : MonoBehaviour
 {
     public enum MonsterType
     {
-        NORMAL,SMALL,BIG,COUNT
+        NORMAL,SMALL,BIG,COUNT,KNIGHT,SNAKE,SILENCE,BOSSCOUNT
     }
 
 
@@ -92,6 +92,22 @@ public class MonsterBase : MonoBehaviour
                     sp = 10;
                     speed = 1.5f;
                     break;
+                case MonsterType.KNIGHT:
+                    spr.sprite = MonsterImages[(int)MonsterType.KNIGHT - 1];
+                    sp = 50;
+                    speed = 1f;
+                    break;
+                case MonsterType.SNAKE:
+                    spr.sprite = MonsterImages[(int)MonsterType.SNAKE - 1];
+                    sp = 50;
+                    speed = 1f;
+                    break;
+                case MonsterType.SILENCE:
+                    spr.sprite = MonsterImages[(int)MonsterType.SILENCE - 1];
+                    sp = 50;
+                    speed = 1f;
+                    break;
+
             }
             if (movePointsQueue.Count != 0)
                 movePoint = movePointsQueue.Dequeue();
@@ -116,7 +132,7 @@ public class MonsterBase : MonoBehaviour
     void MonsterDie()
     {
         isDie = true;
-        //이동중에 다이스에게 죽으면 큐 클리어
+
         movePointsQueue.Clear();
 
         parent.PushMonster(this.gameObject);
@@ -129,10 +145,21 @@ public class MonsterBase : MonoBehaviour
         {
             GameManager.instance.Enemy.Sp += sp;
         }
+
+        if(type >= MonsterType.KNIGHT)
+        {
+            MonsterSpawnerManager.instance.BossDieCount += 1;
+        }
     }
 
     private void Update()
     {
+        //보스몹이아닌경우 보스가소환되면 삭제처리
+        if(type < MonsterType.KNIGHT && !MonsterSpawnerManager.instance.spawnOk)
+        {
+             parent.PushMonster(this.gameObject);
+        }
+
         totalMoveDistance += speed;
         transform.position = Vector2.MoveTowards(transform.position, movePoint,speed*0.005f);
         SortingOrderSet(1000 + (int)(totalMoveDistance));
@@ -186,5 +213,11 @@ public class MonsterBase : MonoBehaviour
         {
             MonsterDie();
         }
+    }
+
+    public void ClearMovePoints()
+    {
+        if(movePointsQueue.Count !=0)
+            movePointsQueue.Clear();
     }
 }

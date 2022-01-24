@@ -5,36 +5,40 @@ using UnityEngine;
 public class CameraResolution : MonoBehaviour
 {
     //현재 화면비
-    float currentAspectRatio = (float)Screen.width / (float)Screen.height;
+
     public float fixedAspectRatioWidth;
     public float fixedAspectRatioHeight;
     Camera cam;
-    float fixedAspectRatio;
+    float fixedaspectratio;
 
     private void Awake()
     {
         cam = GetComponent<Camera>();
-        fixedAspectRatio = fixedAspectRatioWidth / fixedAspectRatioHeight;
-        
+
+        fixedaspectratio = fixedAspectRatioWidth / fixedAspectRatioHeight;
+
     }
     private void Start()
     {
-        if(currentAspectRatio == fixedAspectRatio)
+        float currentaspectratio = (float)Screen.width / (float)Screen.height;
+        if (currentaspectratio == fixedaspectratio)
         {
             return;
         }
-        else if(currentAspectRatio >fixedAspectRatio)
+        else if (currentaspectratio > fixedaspectratio)
         {
-            float w = fixedAspectRatio / currentAspectRatio;
+            float w = fixedaspectratio / currentaspectratio;
             float x = (1 - w) * 0.5f;
             cam.rect = new Rect(x, 0.0f, w, 1.0f);
         }
-        else if(currentAspectRatio < fixedAspectRatio)
+        else if (currentaspectratio < fixedaspectratio)
         {
-            float h = currentAspectRatio / fixedAspectRatio;
+            float h = currentaspectratio / fixedaspectratio;
             float y = (1 - h) * 0.5f;
             cam.rect = new Rect(0.0f, y, 1.0f, h);
         }
+
     }
 
+    void OnPreCull() => GL.Clear(true, true, Color.black);
 }

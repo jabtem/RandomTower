@@ -52,7 +52,12 @@ public class DiceEye : MonoBehaviour
         BulletBase bullet = reqObject.GetComponent<BulletBase>();
         SpriteRenderer bulletColor = reqObject.GetComponent<SpriteRenderer>();
         bulletColor.color = spr.color;
-        bullet.Damage = parent.AttackPower;
+        if(parent.Type != DiceBase.DiceType.ENERGE)
+            bullet.Damage = parent.AttackPower;
+        else if(parent.Type == DiceBase.DiceType.ENERGE)
+        {
+            bullet.Damage =  (int)(parent.AttackPower + GameManager.instance.Player.Sp * (0.04f + 0.003f * (parent.Grade - 1)));
+        }
         reqObject.transform.position = transform.position;
 
         bullet.Target = parent.Target;

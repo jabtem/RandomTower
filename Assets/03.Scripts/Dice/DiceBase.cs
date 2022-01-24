@@ -6,7 +6,7 @@ public class DiceBase : MonoBehaviour
 {
     public enum DiceType
     {
-        FIRE,ELECTRIC,WIND,MIMIC,MINE,IRON,BROKEN,COUNT
+        FIRE,ELECTRIC,WIND,MIMIC,MINE,IRON,BROKEN,SACRIFICE,ENERGE,COUNT
     }
     public enum TargetPrority
     {
@@ -321,6 +321,16 @@ public class DiceBase : MonoBehaviour
         }
         else if(mergeOk)
         {
+            if(type == DiceType.SACRIFICE || (type == DiceType.MIMIC && mergeTarget.Type ==DiceType.SACRIFICE))
+            {
+                if (!parent.isAI)
+                    GameManager.instance.Player.Sp += 80;
+                else if(parent.isAI)
+                {
+                    GameManager.instance.Enemy.Sp += 80;
+                }
+            }
+
             int ranType = Random.Range(0, (int)DiceType.COUNT);
             mergeTarget.Grade += 1;
             mergeTarget.Type = (DiceType)ranType;
@@ -555,6 +565,28 @@ public class DiceBase : MonoBehaviour
                 foreach (var eye in diceEyeSpr)
                 {
                     eye.color = new Color32(194, 64, 255, 255);
+                }
+                break;
+            case DiceType.SACRIFICE:
+                spr.sprite = diceImages[(int)DiceType.SACRIFICE];
+                priority = TargetPrority.FRONT;
+                attackPower = 80 + 10 * (grade - 1);
+                attackSpeed = 1f;
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
+                {
+                    eye.color = new Color32(23, 0, 217, 255);
+                }
+                break;
+            case DiceType.ENERGE:
+                spr.sprite = diceImages[(int)DiceType.ENERGE];
+                priority = TargetPrority.FRONT;
+                attackPower = 20 + 10 * (grade - 1);
+                attackSpeed = 1.3f;
+                attackOk = true;
+                foreach (var eye in diceEyeSpr)
+                {
+                    eye.color = new Color32(0, 217, 190, 255);
                 }
                 break;
         }

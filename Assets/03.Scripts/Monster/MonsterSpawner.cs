@@ -24,6 +24,8 @@ public class MonsterSpawner : MonoBehaviour
 
     public Transform[] movePoints;
 
+    public Transform bossSpawnPoint;
+
     bool isAi;
     public bool IsAi
     {
@@ -86,14 +88,12 @@ public class MonsterSpawner : MonoBehaviour
         //스포너위치에서 시작하도록
         reqObject.transform.position = transform.position;
         MonsterBase monsterBase = reqObject.GetComponent<MonsterBase>();
+        monsterBase.ClearMovePoints();
         activeMonsterSet.Add(monsterBase);
         monsterBase.SetParentSpawner(this);
         monsterBase.EnqueueMovePoints(movePoints);
         monsterBase.Hp = hp;
         monsterBase.Type = (MonsterBase.MonsterType)type;
-
-
-
 
         reqObject.SetActive(true);
     }
